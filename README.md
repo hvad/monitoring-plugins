@@ -1,4 +1,3 @@
-# Monitoring plugins to Linux and BSD
+# Monitoring plugins to Linux, MacOS and BSD
 
-Monitoring plugins package for linux and bsd with python psutil.  
-
+Monitoring plugins package for linux, macos and bsd with python psutil.  
