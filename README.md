@@ -1,4 +1,4 @@
-# Monitoring plugins to Linux
+# Monitoring plugins to Linux and BSB
 
-Monitoring plugins package for linux with python psutil.  
+Monitoring plugins package for linux and bsd with python psutil.  
 
