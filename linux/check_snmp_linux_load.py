@@ -37,8 +37,8 @@ def parse_args():
     port = args.port
     community = args.community
 
-    critical = map(float, args.critical.split(','))
-    warning = map(float, args.warning.split(','))
+    critical = map(int, args.critical.split(','))
+    warning = map(int, args.warning.split(','))
 
     (cload1, cload5, cload15) = critical
     (wload1, wload5, wload15) = warning
@@ -72,7 +72,11 @@ def get_data():
    load1=float(tab[0])
    load5=float(tab[1])
    load15=float(tab[2])
-
+   
+   load1=int(load1)
+   load5=int(load5)
+   load15=int(load15)
+ 
    if load1 >= cload1 or load5 >= cload5 or load15 >= cload15:
        print ('CRITICAL - Load average : %s,%s,%s|load1=%s;load5=%s;load15=%s'
               % (load1, load5, load15, load1, load5, load15))
