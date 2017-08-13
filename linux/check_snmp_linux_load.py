@@ -45,7 +45,7 @@ def parse_args():
     
     return host,port,community,cload1,cload5,cload15,wload1,wload5,wload15
 
-def get_data():
+def main():
 
    host,port,community,cload1,cload5,cload15,wload1,wload5,wload15 = parse_args()
 
@@ -90,9 +90,5 @@ def get_data():
               % (load1, load5, load15, load1, load5, load15))
        raise SystemExit(0)
 
-def main():
-
-    get_data()
-         
 if __name__ == "__main__":
     main()
