@@ -3,23 +3,23 @@
 # -*- coding: utf-8 -*-
 #
 #   Autors: David Hannequin <david.hannequin@gmail.com>,
-#   Date: 2017-02-17
+#   Date: 2019-08-08
 #   URL: https://github.com/hvad/monitoring-plugins
 #   
 #   Plugins to check linux load by SNMP.
 #
-# Shinken plugin is free software: you can redistribute it and/or modify
-# it under the terms of the GNU Affero General Public License as published by
+# Monitoring plugin is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
-# Shinken plugin is distributed in the hope that it will be useful,
+# Monitoring plugin is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU Affero General Public License for more details.
+# GNU General Public License for more details.
 #
-# You should have received a copy of the GNU Affero General Public License
-# along with Shinken.  If not, see <http://www.gnu.org/licenses/>.
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 from pysnmp.hlapi import *
 import argparse
@@ -45,7 +45,7 @@ def parse_args():
     
     return host,port,community,cload1,cload5,cload15,wload1,wload5,wload15
 
-def main():
+def get_data():
 
    host,port,community,cload1,cload5,cload15,wload1,wload5,wload15 = parse_args()
 
@@ -76,19 +76,27 @@ def main():
    load1=int(load1)
    load5=int(load5)
    load15=int(load15)
- 
-   if load1 >= cload1 or load5 >= cload5 or load15 >= cload15:
-       print ('CRITICAL - Load average : %s,%s,%s|load1=%s;load5=%s;load15=%s'
-              % (load1, load5, load15, load1, load5, load15))
-       raise SystemExit(2)
-   elif load1 >= wload1 or load5 >= wload5 or load15 >= wload15:
-       print ('WARNING - Load average : %s,%s,%s|load1=%s;load5=%s;load15=%s'
-              % (load1, load5, load15, load1, load5, load15))
-       raise SystemExit(1)
-   else:
-       print ('OK - Load average : %s,%s,%s|load1=%s;load5=%s;load15=%s'
-              % (load1, load5, load15, load1, load5, load15))
-       raise SystemExit(0)
+   
+   return load1,load5,load15
 
+def main():
+
+    host,port,community,cload1,cload5,cload15,wload1,wload5,wload15 = parse_args()
+   
+    load1,load5,load15 = get_data()
+
+    if load1 >= cload1 or load5 >= cload5 or load15 >= cload15:
+        print ('CRITICAL - Load average : %s,%s,%s|load1=%s;load5=%s;load15=%s'
+               % (load1, load5, load15, load1, load5, load15))
+        raise SystemExit(2)
+    elif load1 >= wload1 or load5 >= wload5 or load15 >= wload15:
+        print ('WARNING - Load average : %s,%s,%s|load1=%s;load5=%s;load15=%s'
+               % (load1, load5, load15, load1, load5, load15))
+        raise SystemExit(1)
+    else:
+        print ('OK - Load average : %s,%s,%s|load1=%s;load5=%s;load15=%s'
+               % (load1, load5, load15, load1, load5, load15))
+        raise SystemExit(0)
+         
 if __name__ == "__main__":
     main()
