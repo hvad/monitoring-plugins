@@ -45,7 +45,6 @@ def parse_args():
 #    auth_protocol = args.auth_protocol
     priv_pass = args.priv_pass
  #   priv_protocol = args.priv_protocol
-#    community = args.community
 
     critical = map(int, args.critical.split(','))
     warning = map(int, args.warning.split(','))
@@ -53,16 +52,12 @@ def parse_args():
     (cload1, cload5, cload15) = critical
     (wload1, wload5, wload15) = warning
     
-#    return host,port,community,cload1,cload5,cload15,wload1,wload5,wload15
-#    return host,port,username,auth_pass,auth_protocol,priv_pass,priv_protocol,cload1,cload5,cload15,wload1,wload5,wload15
-#    return host,port,username,auth_pass,priv_pass
     return host,port,username,auth_pass,priv_pass,cload1,cload5,cload15,wload1,wload5,wload15
 
 
 #def main():
 def get_data():
 
-#    host,port,username,auth_pass,auth_protocol,priv_pass,priv_protocol,cload1,cload5,cload15,wload1,wload5,wload15 = parse_args()
     host,port,username,auth_pass,priv_pass,cload1,cload5,cload15,wload1,wload5,wload15 = parse_args()
     
     errorIndication, errorStatus, errorIndex, varBinds = next(
@@ -77,26 +72,6 @@ def get_data():
                ObjectType(ObjectIdentity('1.3.6.1.4.1.2021.10.1.3.3')))
      )
     
-#    if errorIndication:
-#        print(errorIndication)
-#    elif errorStatus:
-#        print('%s at %s' % (errorStatus.prettyPrint(),
-#                            errorIndex and varBinds[int(errorIndex) - 1][0] or '?'))
-#    else:
-#        for varBind in varBinds:
-#            print(' = '.join([x.prettyPrint() for x in varBind]))
-
-
-#   errorIndication, errorStatus, errorIndex, varBinds = next(
-#       getCmd(SnmpEngine(),
-#              CommunityData(community),
-#              UdpTransportTarget((host, port)),
-#              ContextData(),
-#              ObjectType(ObjectIdentity('1.3.6.1.4.1.2021.10.1.3.1')),
-#              ObjectType(ObjectIdentity('1.3.6.1.4.1.2021.10.1.3.2')),
-#              ObjectType(ObjectIdentity('1.3.6.1.4.1.2021.10.1.3.3')))
-#   )
-#   
     if errorIndication:
         print(errorIndication)
     elif errorStatus:
@@ -119,7 +94,6 @@ def get_data():
 
 def main():
 
-#    host,port,community,cload1,cload5,cload15,wload1,wload5,wload15 = parse_args()
     host,port,username,auth_pass,priv_pass,cload1,cload5,cload15,wload1,wload5,wload15 = parse_args()
    
     load1,load5,load15 = get_data()
