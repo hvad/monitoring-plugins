@@ -84,7 +84,6 @@ def get_data():
     ram_used=float(tab[1])
     swap=float(tab[2])
     swap_used=float(tab[2])
-    
   
     return ram,ram_used,swap,swap_used
 
@@ -94,22 +93,22 @@ def main():
    
     ram,ram_used,swap,swap_used = get_data()
 
-#    if load1 >= cload1 or load5 >= cload5 or load15 >= cload15:
-#        print ('CRITICAL - Load average : %s,%s,%s|load1=%s;load5=%s;load15=%s'
-#               % (load1, load5, load15, load1, load5, load15))
-#        raise SystemExit(2)
-#    elif load1 >= wload1 or load5 >= wload5 or load15 >= wload15:
-#        print ('WARNING - Load average : %s,%s,%s|load1=%s;load5=%s;load15=%s'
-#               % (load1, load5, load15, load1, load5, load15))
-#        raise SystemExit(1)
-#    else:
-#        print ('OK - Load average : %s,%s,%s|load1=%s;load5=%s;load15=%s'
-#               % (load1, load5, load15, load1, load5, load15))
-#        raise SystemExit(0)
-    print (ram)        
-    print (ram_used)        
-    print (swap)        
-    print (swap_used)        
+    ram_used_percent=int((ram_used*100)/ram)
+
+    ram=int(ram/1024)
+    ram_used=int(ram_used/1024)
+    swap=swap/1024
+    swap_used=swap_used/1024
+   
+    if ram_used_percent >= critical:
+      print ('CRITICAL - Memory usage %s%%' % (ram_used_percent))
+      raise SystemExit(2)
+    elif ram_used_percent >= warning:  
+      print ('WARNING - Memory usage %s%%' % (ram_used_percent))
+      raise SystemExit(1)
+    else:
+      print ('OK - Memory usage %s%%' % (ram_used_percent))  
+      raise SystemExit(0)
 
 if __name__ == "__main__":
     main()
