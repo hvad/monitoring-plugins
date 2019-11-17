@@ -24,6 +24,11 @@
 from pysnmp.hlapi import *
 import argparse
 
+oid_ram='1.3.6.1.4.1.2021.4.5.0'
+oid_ram_used='1.3.6.1.4.1.2021.4.6.0'
+oid_swap='1.3.6.1.4.1.2021.4.3.0'
+oid_swap_used='1.3.6.1.4.1.2021.4.4.0'
+
 def parse_args():
 
     parser = argparse.ArgumentParser()
@@ -31,9 +36,7 @@ def parse_args():
     parser.add_argument('-p', '--port', default='161', type=int, help='port')
     parser.add_argument('-u', '--username', default='nagios', type=str, help='login for snmpv3')
     parser.add_argument('-x', '--auth_pass', default='password', type=str, help='auth password for snmpv3')
-#    parser.add_argument('-X', '--auth_protocol', default='SHA', type=str, help='auth protocol for snmpv3')
     parser.add_argument('-a', '--priv_pass', default='private', type=str, help='private password for snmpv3')
-#    parser.add_argument('-A', '--priv_protocol', default='AES', type=str, help='private protocol for snmpv3')
     parser.add_argument('-w', '--warning', default='80', type=int, help='Warning thresold')
     parser.add_argument('-c', '--critical', default='90', type=int, help='Critical thresold')
     args = parser.parse_args()
@@ -41,29 +44,19 @@ def parse_args():
     port = args.port
     username = args.username
     auth_pass = args.auth_pass
-#    auth_protocol = args.auth_protocol
     priv_pass = args.priv_pass
- #   priv_protocol = args.priv_protocol
+    warning = args.warning
+    critical = args.critical
 
-    critical = map(int, args.critical.split(','))
-    warning = map(int, args.warning.split(','))
+#    critical = map(int, args.critical.split(','))
+#    warning = map(int, args.warning.split(','))
 
-    (cload1, cload5, cload15) = critical
-    (wload1, wload5, wload15) = warning
-    
-    return host,port,username,auth_pass,priv_pass,cload1,cload5,cload15,wload1,wload5,wload15
+    return host,port,username,auth_pass,priv_pass,warning,critical
 
-
-#def main():
 def get_data():
 
-    host,port,username,auth_pass,priv_pass,cload1,cload5,cload15,wload1,wload5,wload15 = parse_args()
+    host,port,username,auth_pass,priv_pass,warning,critical = parse_args()
     
-    oid_total_ram='1.3.6.1.4.1.2021.4.5.0'
-    oid_total_ram_used='1.3.6.1.4.1.2021.4.6.0'
-    oid_total_swap='1.3.6.1.4.1.2021.4.3.0'
-    oid_total_swap_used='1.3.6.1.4.1.2021.4.4.0'
-
     errorIndication, errorStatus, errorIndex, varBinds = next(
         getCmd(SnmpEngine(),
                UsmUserData(username, auth_pass, priv_pass,
@@ -71,10 +64,10 @@ def get_data():
                            privProtocol=usmAesCfb128Protocol),
                UdpTransportTarget((host, port)),
                ContextData(),
-               ObjectType(ObjectIdentity(oid_total_ram)),
-               ObjectType(ObjectIdentity(oid_total_ram_used)),
-               ObjectType(ObjectIdentity(oid_total_swap)),
-               ObjectType(ObjectIdentity(oid_total_swap_used)))
+               ObjectType(ObjectIdentity(oid_ram)),
+               ObjectType(ObjectIdentity(oid_ram_used)),
+               ObjectType(ObjectIdentity(oid_swap)),
+               ObjectType(ObjectIdentity(oid_swap_used)))
      )
     
     if errorIndication:
@@ -87,34 +80,36 @@ def get_data():
       for oid, val in varBinds:
         tab.append(val.prettyPrint())
 
-    load1=float(tab[0])
-    load5=float(tab[1])
-    load15=float(tab[2])
+    ram=float(tab[0])
+    ram_used=float(tab[1])
+    swap=float(tab[2])
+    swap_used=float(tab[2])
     
-    load1=int(load1)
-    load5=int(load5)
-    load15=int(load15)
   
-    return load1,load5,load15
+    return ram,ram_used,swap,swap_used
 
 def main():
 
-    host,port,username,auth_pass,priv_pass,cload1,cload5,cload15,wload1,wload5,wload15 = parse_args()
+    host,port,username,auth_pass,priv_pass,warning,critical = parse_args()
    
-    load1,load5,load15 = get_data()
+    ram,ram_used,swap,swap_used = get_data()
 
-    if load1 >= cload1 or load5 >= cload5 or load15 >= cload15:
-        print ('CRITICAL - Load average : %s,%s,%s|load1=%s;load5=%s;load15=%s'
-               % (load1, load5, load15, load1, load5, load15))
-        raise SystemExit(2)
-    elif load1 >= wload1 or load5 >= wload5 or load15 >= wload15:
-        print ('WARNING - Load average : %s,%s,%s|load1=%s;load5=%s;load15=%s'
-               % (load1, load5, load15, load1, load5, load15))
-        raise SystemExit(1)
-    else:
-        print ('OK - Load average : %s,%s,%s|load1=%s;load5=%s;load15=%s'
-               % (load1, load5, load15, load1, load5, load15))
-        raise SystemExit(0)
-         
+#    if load1 >= cload1 or load5 >= cload5 or load15 >= cload15:
+#        print ('CRITICAL - Load average : %s,%s,%s|load1=%s;load5=%s;load15=%s'
+#               % (load1, load5, load15, load1, load5, load15))
+#        raise SystemExit(2)
+#    elif load1 >= wload1 or load5 >= wload5 or load15 >= wload15:
+#        print ('WARNING - Load average : %s,%s,%s|load1=%s;load5=%s;load15=%s'
+#               % (load1, load5, load15, load1, load5, load15))
+#        raise SystemExit(1)
+#    else:
+#        print ('OK - Load average : %s,%s,%s|load1=%s;load5=%s;load15=%s'
+#               % (load1, load5, load15, load1, load5, load15))
+#        raise SystemExit(0)
+    print (ram)        
+    print (ram_used)        
+    print (swap)        
+    print (swap_used)        
+
 if __name__ == "__main__":
     main()
