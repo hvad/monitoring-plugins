@@ -74,9 +74,14 @@ def get_data():
     
     if errorIndication:
         print(errorIndication)
+        raise SystemExit(3)
     elif errorStatus:
         print('%s at %s' % (errorStatus.prettyPrint(),
                             errorIndex and varBinds[int(errorIndex) - 1][0] or '?'))
+        raise SystemExit(3)
+    elif len(varBinds) == 0:
+        print('Error: Could not fetch data at this time.')    
+        raise SystemExit(3)
     else:
       tab=[]
       for oid, val in varBinds:
