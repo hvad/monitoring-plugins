@@ -75,6 +75,10 @@ def data():
 def main():
 
     args = parse_args()
+
+    if args.critical < args.warning: 
+      print ('Warning thresold is greater than thresold critical.')
+      raise SystemExit(3)
    
     memory = data()
 
