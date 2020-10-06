@@ -5,7 +5,7 @@
 #   Autors: David Hannequin <david.hannequin@gmail.com>,
 #   Date: 2019-02-05
 #   URL: https://github.com/hvad/monitoring-plugins
-#   
+#
 #   Plugins to check linux load by SNMP.
 #
 # Shinken plugin is free software: you can redistribute it and/or modify
@@ -21,33 +21,21 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Shinken.  If not, see <http://www.gnu.org/licenses/>.
 
-
-#Disk Statistics
-#
-#Add the following line to snmpd.conf and restart:
-#
-#includeAllDisks 10% for all partitions and disks
-#
-#Disk OID's
-#
-#Path where the disk is mounted: .1.3.6.1.4.1.2021.9.1.2.1
-#Path of the device for the partition: .1.3.6.1.4.1.2021.9.1.3.1
-#Total size of the disk/partion (kBytes): .1.3.6.1.4.1.2021.9.1.6.1
-#Available space on the disk: .1.3.6.1.4.1.2021.9.1.7.1
-#Used space on the disk: .1.3.6.1.4.1.2021.9.1.8.1
-#Percentage of space used on disk: .1.3.6.1.4.1.2021.9.1.9.1
-#Percentage of inodes used on disk: .1.3.6.1.4.1.2021.9.1.10.1
-
 from pysnmp.hlapi import *
 import argparse
+
 
 def parse_args():
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('-H', '--host', default='127.0.0.1', type=str, help='hostname or ip address')
-    parser.add_argument('-p', '--port', default='161', type=int, help='port')
-    parser.add_argument('-C', '--community', default='public', type=str, help='snmp community')
-    parser.add_argument('-P', '--protocol', choices=['2c', '3'], default='2c', type=str, help='snmp version')
+    parser.add_argument('-H', '--host', default='127.0.0.1',
+                        type=str, help='hostname or ip address')
+    parser.add_argument('-p', '--port', default='161',
+                        type=int, help='port')
+    parser.add_argument('-C', '--community', default='public',
+                        type=str, help='snmp community')
+    parser.add_argument('-P', '--protocol', choices=['2c', '3'],
+                        default='2c', type=str, help='snmp version')
     parser.add_argument('-w', '--warning', default='85', type=int, help='')
     parser.add_argument('-c', '--critical', default='90', type=int, help='')
     args = parser.parse_args()
@@ -58,42 +46,44 @@ def parse_args():
     critical = args.critical
     warning = args.warning
 
-    return host,port,community,warning,critical
+    return host, port, community, warning, critical
+
 
 def main():
 
-   host,port,community,warning,critical = parse_args()
+    host, port, community, warning, critical = parse_args()
 
-   errorIndication, errorStatus, errorIndex, varBinds = next(
-       getCmd(SnmpEngine(),
-              CommunityData(community),
-              UdpTransportTarget((host, port)),
-              ContextData(),
-              ObjectType(ObjectIdentity('1.3.6.1.4.1.2021.4.5.0')),
-              ObjectType(ObjectIdentity('1.3.6.1.4.1.2021.4.11.0')),
-              ObjectType(ObjectIdentity('1.3.6.1.4.1.2021.4.6.0')))
-   )
-   
-   if errorIndication:
-       print(errorIndication)
-   elif errorStatus:
-       print('%s at %s' % (errorStatus.prettyPrint(),
-                           errorIndex and varBinds[int(errorIndex) - 1][0] or '?'))
-   else:
-     tab=[]
-     for oid, val in varBinds:
-       tab.append(val.prettyPrint())
+    errorIndication, errorStatus, errorIndex, varBinds = next(
+        getCmd(SnmpEngine(),
+               CommunityData(community),
+               UdpTransportTarget((host, port)),
+               ContextData(),
+               ObjectType(ObjectIdentity('1.3.6.1.4.1.2021.4.5.0')),
+               ObjectType(ObjectIdentity('1.3.6.1.4.1.2021.4.11.0')),
+               ObjectType(ObjectIdentity('1.3.6.1.4.1.2021.4.6.0')))
+    )
 
-   ram_t=int(tab[0])
-   ram_f=int(tab[1])
-   ram_u=int(tab[2])
-   ram_t=ram_t/1024
-   ram_f=ram_f/1024
-   ram_u=ram_u/1024
-   print ('total ram in the machine : %s\n' % ram_t)
-   print ('total ram free : %s\n' % ram_f)
-   print ('total ram used : %s\n' % ram_u)
+    if errorIndication:
+        print(errorIndication)
+    elif errorStatus:
+        print('%s at %s' % (errorStatus.prettyPrint(),
+                            errorIndex and
+                            varBinds[int(errorIndex) - 1][0] or '?'))
+    else:
+        tab = []
+        for oid, val in varBinds:
+            tab.append(val.prettyPrint())
 
-      
+    ram_t = int(tab[0])
+    ram_f = int(tab[1])
+    ram_u = int(tab[2])
+    ram_t = ram_t/1024
+    ram_f = ram_f/1024
+    ram_u = ram_u/1024
+    print('total ram in the machine : %s\n' % ram_t)
+    print('total ram free : %s\n' % ram_f)
+    print('total ram used : %s\n' % ram_u)
+
+
 if __name__ == "__main__":
     main()
